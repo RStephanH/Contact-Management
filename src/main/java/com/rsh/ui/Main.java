@@ -10,17 +10,9 @@ import javafx.stage.Stage;
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage){
-        Button openSignup = new Button("Open Signup Window");
-        openSignup.setOnAction(e -> {
-            new SignupWindow().show();
-        });
-
-        StackPane root = new StackPane(openSignup);
-        Scene scene = new Scene(root, 400, 300);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("Main App");
+        primaryStage.setTitle("Contact Management");
+        primaryStage.setScene(new LoginWindow().create(primaryStage)); // Start with Login
         primaryStage.show();
-
     }
     public static void main(String[] args) {
         launch(args);
