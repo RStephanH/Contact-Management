@@ -2,12 +2,19 @@ package com.rsh.ui;
 
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
 import javafx.stage.Stage;
 
+import com.rsh.ui.controllers.LoginController;
+
 public class LoginWindow {
+
+    private LoginController loginController = new LoginController();
+
     public Scene create(Stage stage) {
+
         Label lblTitle = new Label("Login");
         lblTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
@@ -22,11 +29,19 @@ public class LoginWindow {
             String username = tfUsername.getText();
             String password = pfPassword.getText();
 
-            if (username.equals("admin") && password.equals("1234")) {
-                showAlert(Alert.AlertType.INFORMATION, "Login Successful", "Welcome " + username);
-            } else {
-                showAlert(Alert.AlertType.ERROR, "Login Failed", "Invalid username or password.");
+            try {
+              String result = loginController.login(username, password);
+              showAlert(Alert.AlertType.INFORMATION, "Login Successful", "Welcome" + username +" "+ result);
+            } catch (Exception ex) {
+              ex.printStackTrace();
+              showAlert(Alert.AlertType.ERROR, "Login Failed", ex.getMessage());
             }
+
+            // if (username.equals("admin") && password.equals("1234")) {
+            //     showAlert(Alert.AlertType.INFORMATION, "Login Successful", "Welcome " + username);
+            // } else {
+            //     showAlert(Alert.AlertType.ERROR, "Login Failed", "Invalid username or password.");
+            // }
         });
 
         Button btnGoSignup = new Button("No account? Sign Up");
