@@ -37,11 +37,6 @@ public class LoginWindow {
               showAlert(Alert.AlertType.ERROR, "Login Failed", ex.getMessage());
             }
 
-            // if (username.equals("admin") && password.equals("1234")) {
-            //     showAlert(Alert.AlertType.INFORMATION, "Login Successful", "Welcome " + username);
-            // } else {
-            //     showAlert(Alert.AlertType.ERROR, "Login Failed", "Invalid username or password.");
-            // }
         });
 
         Button btnGoSignup = new Button("No account? Sign Up");
