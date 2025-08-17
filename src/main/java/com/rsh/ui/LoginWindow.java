@@ -26,17 +26,30 @@ public class LoginWindow {
 
         Button btnLogin = new Button("Login");
         btnLogin.setOnAction(e -> {
-            String username = tfUsername.getText();
-            String password = pfPassword.getText();
+            String username = tfUsername.getText().trim();
+            String password = pfPassword.getText().trim();
 
-            try {
-              String result = loginController.login(username, password);
-              showAlert(Alert.AlertType.INFORMATION, "Login Successful", "Welcome" + username +" "+ result);
-            } catch (Exception ex) {
-              ex.printStackTrace();
-              showAlert(Alert.AlertType.ERROR, "Login Failed", ex.getMessage());
+            // Prevent sending empty inputs
+            if (username.isEmpty() || password.isEmpty()) {
+                showAlert(AlertType.WARNING, "Input Error", "Username and password cannot be empty.");
+                return;
             }
 
+            try {
+                // LoginController should throw an Exception or return a special value on failure
+                String result = loginController.login(username, password);
+
+                if (result != null && result.contains("Login successful")) {
+                    showAlert(AlertType.INFORMATION, "Login Successful", "Welcome " + username);
+                    // TODO: navigate to dashboard scene
+                } else {
+                    showAlert(AlertType.WARNING, "Login Failed", "Invalid username or password.");
+                }
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                showAlert(AlertType.ERROR, "Connection Error", "Unable to connect to server.\n" + ex.getMessage());
+            }
         });
 
         Button btnGoSignup = new Button("No account? Sign Up");
@@ -57,3 +70,4 @@ public class LoginWindow {
         alert.showAndWait();
     }
 }
+
