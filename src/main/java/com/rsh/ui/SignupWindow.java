@@ -1,6 +1,6 @@
 package com.rsh.ui;
 
-import com.rsh.model.User;
+import com.rsh.ui.controllers.SignupController;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -8,6 +8,8 @@ import javafx.geometry.Insets;
 import javafx.stage.Stage;
 
 public class SignupWindow {
+    private SignupController signupController = new SignupController();
+
     public Scene create(Stage stage) {
         Label lblTitle = new Label("Sign Up");
         lblTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
@@ -29,16 +31,21 @@ public class SignupWindow {
 
         Button btnSignup = new Button("Sign Up");
         btnSignup.setOnAction(e -> {
-            User newUser = new User(
-                    tfFirstName.getText(),
-                    tfLastName.getText(),
-                    tfEmail.getText(),
-                    tfUsername.getText(),
-                    pfPassword.getText()
-            );
-            showAlert(Alert.AlertType.INFORMATION, "Signup Successful",
-                    "Account created for " + newUser.getClass().getSimpleName() + " - " + tfUsername.getText());
-            stage.setScene(new LoginWindow().create(stage));
+            try {
+                String result = signupController.signup(
+                        tfFirstName.getText(),
+                        tfLastName.getText(),
+                        tfEmail.getText(),
+                        tfUsername.getText(),
+                        pfPassword.getText()
+                );
+                showAlert(Alert.AlertType.INFORMATION, "Signup Successful",
+                        "Account created for " + tfUsername.getText() + "\nResponse: " + result);
+                stage.setScene(new LoginWindow().create(stage));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Signup Failed", ex.getMessage());
+            }
         });
 
         Button btnGoLogin = new Button("Already have an account? Login");
@@ -59,3 +66,4 @@ public class SignupWindow {
         alert.showAndWait();
     }
 }
+
