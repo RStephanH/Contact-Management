@@ -29,9 +29,19 @@ public class SignupWindow {
         PasswordField pfPassword = new PasswordField();
         pfPassword.setPromptText("Password");
 
+        PasswordField pfConfirmPassword = new PasswordField();
+        pfConfirmPassword.setPromptText("Confirm Password");
+
         Button btnSignup = new Button("Sign Up");
         btnSignup.setOnAction(e -> {
             try {
+                // Validate password confirmation
+                if (!pfPassword.getText().equals(pfConfirmPassword.getText())) {
+                    showAlert(Alert.AlertType.WARNING, "Password Mismatch",
+                            "Passwords do not match. Please try again.");
+                    return;
+                }
+
                 String result = signupController.signup(
                         tfFirstName.getText(),
                         tfLastName.getText(),
@@ -51,11 +61,21 @@ public class SignupWindow {
         Button btnGoLogin = new Button("Already have an account? Login");
         btnGoLogin.setOnAction(e -> stage.setScene(new LoginWindow().create(stage)));
 
-        VBox layout = new VBox(10, lblTitle, tfFirstName, tfLastName, tfEmail, tfUsername, pfPassword, btnSignup, btnGoLogin);
+        VBox layout = new VBox(10,
+                lblTitle,
+                tfFirstName,
+                tfLastName,
+                tfEmail,
+                tfUsername,
+                pfPassword,
+                pfConfirmPassword,
+                btnSignup,
+                btnGoLogin
+        );
         layout.setPadding(new Insets(20));
         layout.setStyle("-fx-alignment: center;");
 
-        return new Scene(layout, 350, 400);
+        return new Scene(layout, 350, 450);
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {
