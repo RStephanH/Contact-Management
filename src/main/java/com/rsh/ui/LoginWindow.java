@@ -8,10 +8,12 @@ import javafx.geometry.Insets;
 import javafx.stage.Stage;
 
 import com.rsh.ui.controllers.LoginController;
+import com.rsh.ui.dto.LoginResponse;
+import com.rsh.model.User;
 
 public class LoginWindow {
 
-    private LoginController loginController = new LoginController();
+    private final LoginController loginController = new LoginController();
 
     public Scene create(Stage stage) {
 
@@ -29,21 +31,30 @@ public class LoginWindow {
             String username = tfUsername.getText().trim();
             String password = pfPassword.getText().trim();
 
-            // Prevent sending empty inputs
             if (username.isEmpty() || password.isEmpty()) {
                 showAlert(AlertType.WARNING, "Input Error", "Username and password cannot be empty.");
                 return;
             }
 
             try {
-                // LoginController should throw an Exception or return a special value on failure
-                String result = loginController.login(username, password);
+                LoginResponse result = loginController.login(username, password);
 
-                if (result != null && result.contains("Login successful")) {
-                    showAlert(AlertType.INFORMATION, "Login Successful", "Welcome " + username);
-                    // TODO: navigate to dashboard scene
+                if (result.isSuccess()) {
+                    // Create User instance from backend response
+                    User loggedUser = new User(
+                            result.getFirstName(),
+                            result.getLastName(),
+                            result.getMail(),
+                            result.getUsername(),
+                            result.getUserId()
+                    );
+
+                    showAlert(AlertType.INFORMATION, "Login Successful",
+                            "Welcome " + loggedUser.getFullName() + "\nUserId: " + loggedUser.getUserId());
+
+                    // TODO: pass loggedUser to the main window or dashboard
                 } else {
-                    showAlert(AlertType.WARNING, "Login Failed", "Invalid username or password.");
+                    showAlert(AlertType.WARNING, "Login Failed", result.getMessage());
                 }
 
             } catch (Exception ex) {

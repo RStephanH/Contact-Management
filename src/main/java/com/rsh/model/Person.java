@@ -1,7 +1,6 @@
 package com.rsh.model;
 
-public class Person {
-    protected int mId;
+public abstract class Person {
     protected String mFirstName;
     protected String mLastName;
     protected String mEmail;
@@ -24,12 +23,8 @@ public class Person {
         return this.mEmail;
     }
 
-    public int getId() {
-        return this.mId;
-    }
-
     public String getFullName() {
         return this.mFirstName.concat(" ").concat(this.mLastName);
-
     }
 }
+
