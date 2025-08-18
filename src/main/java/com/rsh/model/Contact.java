@@ -22,4 +22,15 @@ public class Contact extends Person{
     return this.mContactId;
   }
 
+  public void setFirstName(String firstName){
+    this.mFirstName=firstName;
+  }
+
+  public void setLastName(String lastName){
+    this.mLastName=lastName;
+  }
+  public void setMail(String mail){
+    this.mEmail=mail;
+  }
+
 }

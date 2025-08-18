@@ -7,6 +7,7 @@ import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
 import javafx.stage.Stage;
 
+
 import com.rsh.ui.controllers.LoginController;
 import com.rsh.ui.dto.LoginResponse;
 import com.rsh.model.User;
@@ -49,9 +50,10 @@ public class LoginWindow {
                             result.getUserId()
                     );
 
-                    showAlert(AlertType.INFORMATION, "Login Successful",
-                            "Welcome " + loggedUser.getFullName() + "\nUserId: " + loggedUser.getUserId());
+                    // showAlert(AlertType.INFORMATION, "Login Successful",
+                    //         "Welcome " + loggedUser.getFullName() + "\nUserId: " + loggedUser.getUserId());
 
+                    stage.setScene(new MainWindow(loggedUser).create(stage));
                     // TODO: pass loggedUser to the main window or dashboard
                 } else {
                     showAlert(AlertType.WARNING, "Login Failed", result.getMessage());
