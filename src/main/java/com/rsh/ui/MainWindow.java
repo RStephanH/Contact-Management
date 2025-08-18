@@ -2,6 +2,9 @@ package com.rsh.ui;
 
 import com.rsh.model.User;
 import com.rsh.model.ContactFX;
+import com.rsh.ui.dto.ContactDTO;
+import com.rsh.mapper.ContactMapper;
+import com.rsh.client.ContactApiClient;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -124,16 +127,18 @@ public class MainWindow {
 
         Button btnSubmit = new Button("Add Contact");
         btnSubmit.setOnAction(e -> {
-            ContactFX newContact = new ContactFX(
-                String.valueOf(contactList.size() + 1), // simple auto-id pour l'instant
-                tfFirstName.getText(),
-                tfLastName.getText(),
-                tfEmail.getText(),
-                tfPhone.getText(),
-                loggedUser.getUserId()
-            );
-            contactList.add(newContact);
-            mainContent.setCenter(new Label("Contact added!"));
+            ContactApiClient apiClient = new ContactApiClient();
+
+            ContactDTO dto = new ContactDTO(null, tfFirstName.getText(), tfLastName.getText(), tfEmail.getText(), tfPhone.getText(), loggedUser.getUserId());
+            try {
+              ContactDTO savedDTO = apiClient.createContact(dto);
+              ContactFX savedFX = ContactMapper.toFX(savedDTO);
+              contactList.add(savedFX);
+              mainContent.setCenter(new Label("Contact added!"));
+            } catch (Exception ex) {
+              ex.printStackTrace();
+            }
+
         });
 
         form.getChildren().addAll(tfFirstName, tfLastName, tfEmail, tfPhone, btnSubmit);
