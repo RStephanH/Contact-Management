@@ -12,6 +12,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import java.util.List;
+import java.util.Arrays;
+
 
 public class MainWindow {
 
@@ -22,8 +25,8 @@ public class MainWindow {
         this.loggedUser = loggedUser;
 
         // Exemple de données (plus tard tu remplaceras par un appel au backend)
-        contactList.add(new ContactFX("1", "Alice", "Smith", "alice@example.com", "123456789", loggedUser.getUserId()));
-        contactList.add(new ContactFX("2", "Bob", "Johnson", "bob@example.com", "987654321", loggedUser.getUserId()));
+        // contactList.add(new ContactFX("1", "Alice", "Smith", "alice@example.com", "123456789", loggedUser.getUserId()));
+        // contactList.add(new ContactFX("2", "Bob", "Johnson", "bob@example.com", "987654321", loggedUser.getUserId()));
     }
 
     public Scene create(Stage stage) {
@@ -98,7 +101,20 @@ public class MainWindow {
         mainContent.setCenter(lblPlaceholder);
 
         // ===================== Sidebar Button Actions =====================
-        btnContacts.setOnAction(e -> mainContent.setCenter(contactTable));
+        btnContacts.setOnAction(e -> {
+          ContactApiClient apiClient = new ContactApiClient();
+          try {
+            List<ContactDTO> dtoList = apiClient.getContactsByUserId(loggedUser.getUserId());
+            contactList.clear();
+            dtoList.forEach(dto -> contactList.add(ContactMapper.toFX(dto)));
+          } catch (Exception ex) {
+            ex.printStackTrace();
+            mainContent.setCenter(new Label("Failed to load contacts."));
+          }
+
+          mainContent.setCenter(contactTable);
+        });
+
         btnAddContact.setOnAction(e -> showAddContactForm(mainContent));
         btnSettings.setOnAction(e -> mainContent.setCenter(new Label("User Settings")));
 
