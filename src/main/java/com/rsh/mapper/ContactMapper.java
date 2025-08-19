@@ -7,7 +7,7 @@ public class ContactMapper {
 
     public static ContactDTO toDTO(ContactFX fx) {
         return new ContactDTO(
-            null,  // ID sera généré côté backend
+            null,  // ID will be generate in the backend side
             fx.getFirstName(),
             fx.getLastName(),
             fx.getEmail(),
