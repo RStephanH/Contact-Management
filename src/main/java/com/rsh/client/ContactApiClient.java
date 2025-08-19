@@ -81,6 +81,25 @@ public class ContactApiClient {
         throw new RuntimeException("API Error: " + response.statusCode());
     }
 }
+  public boolean deleteContact(Long id) throws Exception {
+    HttpRequest request = HttpRequest.newBuilder()
+        .uri(URI.create(BASE_URL + "/" + id))
+        .header("Accept", "application/json")
+        .DELETE()
+        .build();
+
+    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+    if (response.statusCode() == 200 || response.statusCode() == 204) {
+        // Suppression réussie, rien à retourner
+      return true;
+    } else if (response.statusCode() == 404) {
+        throw new RuntimeException("Contact not found with id: " + id);
+    } else {
+        throw new RuntimeException("API Error: " + response.statusCode());
+    }
+}
+
 
 }
 
