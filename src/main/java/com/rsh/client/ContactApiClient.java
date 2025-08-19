@@ -13,53 +13,74 @@ public class ContactApiClient {
     private final Gson gson = new Gson();
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public ContactDTO createContact(ContactDTO dto) throws Exception {
-        String json = gson.toJson(dto);
+  public ContactDTO createContact(ContactDTO dto) throws Exception {
+    String json = gson.toJson(dto);
 
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(BASE_URL))
-            .header("Content-Type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(json))
-            .build();
+    HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create(BASE_URL))
+    .header("Content-Type", "application/json")
+    .POST(HttpRequest.BodyPublishers.ofString(json))
+    .build();
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        if (response.statusCode() == 201) {
-            return gson.fromJson(response.body(), ContactDTO.class);
-        } else {
-            throw new RuntimeException("Erreur API: " + response.statusCode());
-        }
+    if (response.statusCode() == 201) {
+      return gson.fromJson(response.body(), ContactDTO.class);
+    } else {
+      throw new RuntimeException("API Error: " + response.statusCode());
     }
+  }
 
   public List<ContactDTO> getContactsByUserId(String userId) throws Exception {
-        String url = BASE_URL + "/user/" + userId;
+    String url = BASE_URL + "/user/" + userId;
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .header("Accept", "application/json")
-                .GET()
-                .build();
+    HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create(url))
+    .header("Accept", "application/json")
+    .GET()
+    .build();
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        ContactDTO[] dtoArray = mapper.readValue(response.body(), ContactDTO[].class);
-        return Arrays.asList(dtoArray);
+    ContactDTO[] dtoArray = mapper.readValue(response.body(), ContactDTO[].class);
+    return Arrays.asList(dtoArray);
+  }
+
+  public List<ContactDTO> getAllContacts() throws Exception {
+    HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create(BASE_URL))
+    .GET()
+    .build();
+
+    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+    if (response.statusCode() == 200) {
+      ContactDTO[] contacts = gson.fromJson(response.body(), ContactDTO[].class);
+      return Arrays.asList(contacts);
+    } else {
+      throw new RuntimeException("API Error: " + response.statusCode());
     }
+  }
 
-    public List<ContactDTO> getAllContacts() throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(BASE_URL))
-            .GET()
-            .build();
+  public ContactDTO updateContact(Long id, ContactDTO dto) throws Exception {
+    String json = gson.toJson(dto);
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+    HttpRequest request = HttpRequest.newBuilder()
+        .uri(URI.create(BASE_URL + "/" + id))
+        .header("Content-Type", "application/json")
+        .PUT(HttpRequest.BodyPublishers.ofString(json))
+        .build();
 
-        if (response.statusCode() == 200) {
-            ContactDTO[] contacts = gson.fromJson(response.body(), ContactDTO[].class);
-            return Arrays.asList(contacts);
-        } else {
-            throw new RuntimeException("Erreur API: " + response.statusCode());
-        }
+    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+    if (response.statusCode() == 200) {
+        return gson.fromJson(response.body(), ContactDTO.class);
+    } else if (response.statusCode() == 404) {
+        throw new RuntimeException("Contact not found with the id :" + id);
+    } else {
+        throw new RuntimeException("API Error: " + response.statusCode());
     }
+}
+
 }
 
