@@ -61,7 +61,7 @@ public class MainWindow {
     BorderPane mainContent = new BorderPane();
     mainContent.setPadding(new Insets(10));
 
-    // TableView pour les contacts (⚡ utilise ContactFX maintenant)
+    // TableView for contacts 
     TableView<ContactFX> contactTable = new TableView<>();
     contactTable.setItems(contactList);
 
@@ -77,9 +77,64 @@ public class MainWindow {
     colPhone.setCellValueFactory(c -> c.getValue().phoneProperty());
     colPhone.setPrefWidth(150);
 
-    contactTable.getColumns().addAll(colName, colEmail, colPhone);
+    // Delete Column
+    TableColumn<ContactFX, Void> colDelete = new TableColumn<>("Action");
 
-    // Double-clic pour éditer
+    colDelete.setCellFactory(tc -> new TableCell<>() {
+      private final Button btnDelete = new Button("Delete");
+
+    {
+        btnDelete.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-cursor: hand;");
+        btnDelete.setOnAction(e -> {
+          ContactFX contact = getTableView().getItems().get(getIndex());
+
+          // Validation Box
+          Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+          confirmAlert.setTitle("Confirm Deletion");
+          confirmAlert.setHeaderText("Delete Contact");
+          confirmAlert.setContentText("Are you sure you want to delete " 
+            + contact.getFirstName() + " " + contact.getLastName() + " ?");
+
+          confirmAlert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+              try {
+                ContactApiClient apiClient = new ContactApiClient();
+                boolean status = apiClient.deleteContact(Long.parseLong(contact.getContactId())); // API call
+                contactList.remove(contact); // retirer de l'UI
+                if(status){
+                  // Success Notification
+                  Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                  successAlert.setTitle("Contact Deleted");
+                  successAlert.setHeaderText(null);
+                  successAlert.setContentText("Contact deleted successfully!");
+                  successAlert.showAndWait();
+                }
+              } catch (Exception ex) {
+                ex.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to delete contact!");
+                alert.showAndWait();
+              }
+            }
+          });
+        });
+      }
+
+      @Override
+      protected void updateItem(Void item, boolean empty) {
+        super.updateItem(item, empty);
+        if (empty) {
+          setGraphic(null);
+        } else {
+          setGraphic(btnDelete);
+        }
+      }
+    });
+
+    contactTable.getColumns().addAll(colName, colEmail, colPhone, colDelete);
+
+
+
+    // Double-click to edit
     contactTable.setRowFactory(tv -> {
       TableRow<ContactFX> row = new TableRow<>();
       row.setOnMouseClicked(event -> {
@@ -91,7 +146,7 @@ public class MainWindow {
       return row;
     });
 
-    // Label par défaut
+    // Default label
     Label lblPlaceholder = new Label("Select an option from the sidebar");
     mainContent.setCenter(lblPlaceholder);
 
@@ -173,7 +228,7 @@ public class MainWindow {
     btnSave.setOnAction(e -> {
       try {
         // Create DTO from ContactFX
-        ContactDTO dto = new ContactDTO(contact.getContactId(),tfFirstName.getText(), tfLastName.getText(), tfEmail.getText(), tfPhone.getText(), contact.getUserId());
+        ContactDTO dto = new ContactDTO(contact.getContactId(),tfFirstName.getText(), tfLastName.getText(), tfEmail.getText(), tfPhone.getText(), contact.getUserId()                                                  );
 
         // Call the API for the update
         ContactApiClient apiClient = new ContactApiClient();
